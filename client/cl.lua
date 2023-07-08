@@ -1,16 +1,10 @@
-
 local ESX = exports['es_extended']:getSharedObject()
 alreadysearched = {}
 
-
 CreateThread(function()
-    while ESX == nil do
-        TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
-        Wait(0)
-    end
+    local p = PlayerPedId()
     while true do
         local wait = 1000
-        local p = PlayerPedId()
         for i=1, #Config.Props, 1 do
             local prophash = GetClosestObjectOfType(GetEntityCoords(p), 1.0, GetHashKey(Config.Props[i]), false)
             if prophash ~= 0 then
@@ -18,6 +12,7 @@ CreateThread(function()
                 Draw3DText(GetEntityCoords(prophash), Config.SearchText, 0.35)
                 if IsControlJustReleased(0, Config.StartButton) then
                     if not alreadysearched[prophash] then
+                        local safehash = prophash
                         search(prophash)
                     else
                         ESX.ShowNotification(Config.AlreadySearched)
@@ -48,7 +43,7 @@ function search(prophash)
     local itemCount = 0
     local itemLabel = ""
 
-    ESX.TriggerServerCallback(GetCurrentResourceName(), function(found, object, quantity)
+    ESX.TriggerServerCallback(GetCurrentResourceName(), function(found, object, quantity, safehash, prophash)
         if found then
             foundItem = true
             itemCount = quantity
@@ -81,5 +76,4 @@ function Draw3DText(coords, text, scale)
     DrawText(x, y)
     local factor = (string.len(text)) / 400
     DrawRect(x,y+0.0125, 0.008+ factor, 0.03, 61, 11, 41, 68)
-    
 end
